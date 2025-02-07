@@ -15,9 +15,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install dependencies
-        run: pip install pre-commit
       - name: Test
         run: docker compose run --rm app sh -c "python manage.py test"
-      - name: Run pre-commit hooks
-        run: docker compose run --rm app sh -c "pre-commit run --all-files"
+      - name: Lint
+        run: run: docker compose run --rm app sh -c "pip install pre-commit && pre-commit run --all-files"
