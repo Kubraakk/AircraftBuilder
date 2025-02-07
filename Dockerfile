@@ -24,7 +24,9 @@ RUN python -m venv /py && \
     adduser \
     --disabled-password \
     --no-create-home \
-    django-user
+    django-user && \
+    mkdir -p /home/django-user/.cache/pre-commit && \
+    chown -R django-user:django-user /home/django-user
 
 ENV PATH="/py/bin:$PATH"
 
