@@ -1,17 +1,24 @@
 repos:
-  # Genel Pre-commit Hook'ları
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
-      - id: check-yaml
       - id: check-added-large-files
 
-  # Ruff - Python Linter ve Formatter
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.1
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
     hooks:
-      - id: ruff
-        args: [--fix]
-      - id: ruff-format
+      - id: flake8
+        args: ["--max-line-length=79", "--exclude=*/migrations/*"]
+
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        args: ["--line-length=79"]
+
+  - repo: https://github.com/hhatto/autopep8
+    rev: v2.3.2
+    hooks:
+      - id: autopep8
