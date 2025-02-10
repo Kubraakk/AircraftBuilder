@@ -1,81 +1,67 @@
 from rest_framework import serializers
+from collections import defaultdict
 from .models import Part, Inventory, Assembly, AssemblyPartUsage
 
 
-# 1️⃣ Parça Serializer
 class PartSerializer(serializers.ModelSerializer):
+    name_display = serializers.CharField(
+        source="get_name_display", read_only=True
+    )
+
     class Meta:
         model = Part
-        fields = ["id", "name", "aircraft", "team"]
+        fields = ["id", "name", "name_display", "aircraft", "team"]
 
 
-# 2️⃣ Envanter Serializer
 class InventorySerializer(serializers.ModelSerializer):
-    part_name = serializers.ReadOnlyField(source="part.name")
-    aircraft_name = serializers.ReadOnlyField(source="part.aircraft.name")
+    part_name = serializers.CharField(
+        source="part.get_name_display", read_only=True
+    )
+    aircraft_name = serializers.CharField(
+        source="part.aircraft.get_aircraft_name_display", read_only=True
+    )
 
     class Meta:
         model = Inventory
         fields = ["id", "part_name", "aircraft_name", "quantity"]
 
 
-# 3️⃣ Montaj Serializer
 class AssemblyPartUsageSerializer(serializers.ModelSerializer):
+    part_name = serializers.CharField(source="part.get_name_display")
+
     class Meta:
         model = AssemblyPartUsage
-        fields = ["part", "quantity_used"]
+        fields = ["part_name", "quantity_used"]
 
 
 class AssemblySerializer(serializers.ModelSerializer):
-    parts_used = AssemblyPartUsageSerializer(many=True)
+    aircraft_name = serializers.CharField(
+        source="aircraft.get_aircraft_name_display", read_only=True
+    )
+    parts_used = serializers.SerializerMethodField()
 
     class Meta:
         model = Assembly
-        fields = ["id", "aircraft", "parts_used", "created_at"]
+        fields = [
+            "id",
+            "aircraft",
+            "aircraft_name",
+            "parts_used",
+            "created_at",
+        ]
 
-    def validate(self, data):
+    def get_parts_used(self, obj):
         """
-        Uçak üretimi sırasında envanterde eksik parça olup olmadığını kontrol eder.
+        Montajda kullanılan parçaları doğru şekilde listele.
         """
-        aircraft = data["aircraft"]
-        required_parts = aircraft.parts.all()
-        inventory = Inventory.objects.filter(part__aircraft=aircraft)
+        part_usage_dict = defaultdict(int)
 
-        missing_parts = []
-        for part in required_parts:
-            available = inventory.filter(part=part).first()
-            if not available or available.quantity < 1:
-                missing_parts.append(part.name)
+        for usage in AssemblyPartUsage.objects.filter(assembly=obj):
+            part_usage_dict[
+                usage.part.get_name_display()
+            ] += usage.quantity_used
 
-        if missing_parts:
-            raise serializers.ValidationError(
-                f"Eksik parçalar: {', '.join(missing_parts)}"
-            )
-
-        return data
-
-    def create(self, validated_data):
-        """
-        Montaj işlemi gerçekleştiğinde, kullanılan parçalar envanterden düşülmelidir.
-        """
-        parts_data = validated_data.pop("parts_used")
-        assembly = Assembly.objects.create(**validated_data)
-
-        for part_usage in parts_data:
-            part = part_usage["part"]
-            quantity_used = part_usage["quantity_used"]
-
-            inventory_item = Inventory.objects.get(part=part)
-            if inventory_item.quantity < quantity_used:
-                raise serializers.ValidationError(
-                    f"{part.name} için yeterli stok yok!"
-                )
-
-            inventory_item.quantity -= quantity_used
-            inventory_item.save()
-
-            AssemblyPartUsage.objects.create(
-                assembly=assembly, part=part, quantity_used=quantity_used
-            )
-
-        return assembly
+        return [
+            {"part_name": part, "quantity_used": quantity}
+            for part, quantity in part_usage_dict.items()
+        ]

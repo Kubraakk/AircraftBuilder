@@ -11,10 +11,10 @@ repos:
     hooks:
       - id: flake8
         args: [
-            "--max-line-length=79",
+            "--max-line-length=88",
             "--exclude=*/migrations/*,
             */settings.py",
-            "--ignore=E501",
+            "--ignore=E501,W503, W504",
           ]
 
   - repo: https://github.com/psf/black

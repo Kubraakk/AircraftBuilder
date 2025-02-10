@@ -23,7 +23,6 @@ class Part(models.Model):
     class Meta:
         verbose_name = _("Part")
         verbose_name_plural = _("Parts")
-        unique_together = ("name", "aircraft")
 
     def __str__(self):
         return f"{self.get_name_display()} for {self.aircraft.get_aircraft_name_display()}"
