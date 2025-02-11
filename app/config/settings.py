@@ -44,10 +44,11 @@ DJANGO_APPS = [
 
 LOCAL_APPS = [
     "apps.aircraft",
-    "core",
     "apps.user",
     "apps.teams",
     "apps.part",
+    "core",
+    "userpanel",
 ]
 
 THIRD_PARTY_APPS = [
@@ -73,7 +74,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "apps/templates"],
+        "DIRS": [BASE_DIR / "userpanel/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -140,6 +141,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -157,6 +160,9 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
 }
 
 SIMPLE_JWT = {
@@ -166,3 +172,5 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+APPEND_SLASH = False

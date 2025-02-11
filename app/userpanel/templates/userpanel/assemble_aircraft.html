@@ -1,0 +1,90 @@
+{% extends "userpanel/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Uçak Montajı</h2>
+
+    <div id="error-message" class="alert alert-danger d-none text-center"></div>
+    <div id="success-message" class="alert alert-success d-none text-center"></div>
+
+    <div class="mb-3">
+        <label class="form-label">Uçak Seçin</label>
+        <select class="form-control" id="aircraft">
+            <option value="1" data-image="/static/images/tb2.png">Bayraktar TB2</option>
+            <option value="2" data-image="/static/images/tb3.png">Bayraktar TB3</option>
+            <option value="3" data-image="/static/images/akinci.png">AKINCI</option>
+            <option value="4" data-image="/static/images/kizilelma.png">KIZILELMA</option>
+        </select>
+    </div>
+    <div class="text-center mt-3">
+        <img id="aircraft-image" src="" alt="Uçak Görseli" class="img-fluid d-none">
+    </div>
+
+    <button id="assemble-btn" class="btn btn-primary w-100">Montajı Başlat</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+        window.location.href = "{% url 'login' %}";
+        return;
+    }
+
+    const aircraftSelect = document.getElementById("aircraft");
+    const aircraftImage = document.getElementById("aircraft-image");
+    const assembleBtn = document.getElementById("assemble-btn");
+    const errorMessage = document.getElementById("error-message");
+    const successMessage = document.getElementById("success-message");
+
+    aircraftSelect.addEventListener("change", function () {
+        const selectedOption = aircraftSelect.options[aircraftSelect.selectedIndex];
+        const imageSrc = selectedOption.getAttribute("data-image");
+
+        if (imageSrc) {
+            aircraftImage.src = imageSrc;
+            aircraftImage.classList.remove("d-none");
+        } else {
+            aircraftImage.classList.add("d-none");
+        }
+    });
+
+    assembleBtn.addEventListener("click", function () {
+        const aircraftId = aircraftSelect.value;
+
+        if (!aircraftId) {
+            errorMessage.innerText = "Lütfen bir uçak modeli seçin!";
+            errorMessage.classList.remove("d-none");
+            return;
+        }
+
+        fetch("/api/parts/assembly/assemble/", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ aircraft: aircraftId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                errorMessage.innerText = data.error;
+                errorMessage.classList.remove("d-none");
+                successMessage.classList.add("d-none");
+            } else {
+                successMessage.innerText = "Uçak başarıyla monte edildi!";
+                successMessage.classList.remove("d-none");
+                errorMessage.classList.add("d-none");
+            }
+        })
+        .catch(error => {
+            errorMessage.innerText = "Montaj işlemi sırasında bir hata oluştu.";
+            errorMessage.classList.remove("d-none");
+            console.error("Montaj hatası:", error);
+        });
+    });
+});
+</script>
+{% endblock %}

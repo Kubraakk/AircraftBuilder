@@ -1,0 +1,89 @@
+{% extends "userpanel/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Envanter Durumu</h2>
+
+    <table class="table table-bordered mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Parça Adı</th>
+                <th>Uçak Modeli</th>
+                <th>Miktar</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="inventory-table">
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+        window.location.href = "{% url 'login' %}";  // Giriş yapılmadıysa login sayfasına yönlendir
+        return;
+    }
+
+    const inventoryTable = document.getElementById("inventory-table");
+
+    function fetchInventory() {
+        fetch("/api/parts/inventory/", {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${accessToken}` }
+        })
+        .then(response => response.json())
+        .then(data => {
+            inventoryTable.innerHTML = "";  // Önce tabloyu temizle
+
+            data.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.part_name}</td>
+                    <td>${item.aircraft_name}</td>
+                    <td>${item.quantity}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${item.id}" ${item.quantity > 0 ? "" : "disabled"}>
+                            Sil
+                        </button>
+                    </td>
+                `;
+                inventoryTable.appendChild(row);
+            });
+
+            // Silme butonlarına event listener ekle
+            document.querySelectorAll(".delete-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    const partId = this.getAttribute("data-id");
+                    deletePart(partId);
+                });
+            });
+        })
+        .catch(error => console.error("Envanter alınamadı:", error));
+    }
+
+    function deletePart(partId) {
+        if (!confirm("Bu parçayı silmek istediğinize emin misiniz?")) return;
+
+        fetch(`/api/parts/parts/${partId}/`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${accessToken}` }
+        })
+        .then(response => {
+            if (response.status === 204) {
+                alert("Parça başarıyla silindi!");
+                fetchInventory(); // Listeyi güncelle
+            } else {
+                alert("Parça silinirken hata oluştu!");
+            }
+        })
+        .catch(error => console.error("Silme işlemi başarısız:", error));
+    }
+
+    // Sayfa açıldığında envanteri yükle
+    fetchInventory();
+});
+</script>
+{% endblock %}

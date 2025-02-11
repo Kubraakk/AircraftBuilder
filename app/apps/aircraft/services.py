@@ -7,3 +7,6 @@ class AircraftService(BaseService):
 
     def __init__(self):
         super().__init__(Aircraft)
+
+    def get_aircraft_count(self):
+        return self.model.objects.count()

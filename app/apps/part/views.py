@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
-from core.permissions import IsAssemblyTeam, IsTeamMember
+from rest_framework.views import APIView
+from core.permissions import IsTeamMember
 from core.enums import TeamChoices
 from apps.aircraft.models import Aircraft
 from apps.part.serializers import (
@@ -52,7 +53,6 @@ class PartViewSet(viewsets.ModelViewSet):
                     "error": "Yalnızca kendi takımınıza ait parçaları silebilirsiniz!"
                 }
             )
-
         self.service.delete_part(instance)
 
 
@@ -74,7 +74,7 @@ class InventoryViewSet(viewsets.ModelViewSet):
 
 class AssemblyViewSet(viewsets.ModelViewSet):
     serializer_class = AssemblySerializer
-    permission_classes = [IsAuthenticated, IsAssemblyTeam]
+    permission_classes = [IsAuthenticated]
     service = AssemblyService()
 
     def get_queryset(self):
@@ -103,3 +103,33 @@ class AssemblyViewSet(viewsets.ModelViewSet):
             return Response(result, status=status_code)
 
         return Response(AssemblySerializer(result).data, status=status_code)
+
+
+class PartsCountView(APIView):
+    permission_classes = [IsAuthenticated]
+    service = PartService()
+
+    def list(self, request):
+        """Stoktaki toplam parça sayısını döndür"""
+        count = self.service.get_total_parts_count()
+        return Response({"count": count})
+
+
+class MissingPartsView(APIView):
+    permission_classes = [IsAuthenticated]
+    service = PartService()
+
+    def list(self, request):
+        """Eksik parçaları listeleyen endpoint"""
+        missing_parts = self.service.get_missing_parts()
+        return Response({"missing_parts": missing_parts})
+
+
+class AssemblyCountView(APIView):
+    permission_classes = [IsAuthenticated]
+    service = AssemblyService()
+
+    def get(self, request):
+        """Tamamlanan montaj işlemlerinin sayısını döndür"""
+        count = self.service.get_all().count()
+        return Response({"count": count})

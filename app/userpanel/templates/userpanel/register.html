@@ -1,0 +1,91 @@
+{% extends "userpanel/base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h3 class="text-center">Kayıt Ol</h3>
+        <div id="error-message" class="alert alert-danger d-none"></div>
+        <form id="register-form">
+            <div class="mb-3">
+                <label class="form-label">Ad</label>
+                <input type="text" class="form-control" id="first_name" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Soyad</label>
+                <input type="text" class="form-control" id="last_name" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">E-posta</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Şifre</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Şifre Tekrar</label>
+                <input type="password" class="form-control" id="password2" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Takım Seçin</label>
+                <select class="form-control" id="team" required>
+                    <option value="">Takımınızı Seçin</option>
+                    <option value="1">Kanat Takımı</option>
+                    <option value="2">Gövde Takımı</option>
+                    <option value="3">Kuyruk Takımı</option>
+                    <option value="4">Aviyonik Takımı</option>
+                    <option value="5">Montaj Takımı</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Kayıt Ol</button>
+        </form>
+        <div class="text-center mt-3">
+            <p>Zaten bir hesabınız var mı? <a href="{% url 'login' %}">Giriş Yap</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("register-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let first_name = document.getElementById("first_name").value;
+        let last_name = document.getElementById("last_name").value;
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
+        let password2 = document.getElementById("password2").value;
+        let team = document.getElementById("team").value;
+
+        if (password !== password2) {
+            document.getElementById("error-message").innerText = "Şifreler uyuşmuyor!";
+            document.getElementById("error-message").classList.remove("d-none");
+            return;
+        }
+
+        if (!team) {
+            document.getElementById("error-message").innerText = "Lütfen bir takım seçin!";
+            document.getElementById("error-message").classList.remove("d-none");
+            return;
+        }
+
+        fetch("/api/auth/register/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ first_name, last_name, email, password, team })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.email) {
+                alert("Kayıt başarılı! Giriş yapabilirsiniz.");
+                window.location.href = "{% url 'login' %}";
+            } else {
+                document.getElementById("error-message").innerText = "Kayıt sırasında hata oluştu!";
+                document.getElementById("error-message").classList.remove("d-none");
+            }
+        })
+        .catch(error => console.error("Kayıt hatası:", error));
+    });
+});
+</script>
+{% endblock %}

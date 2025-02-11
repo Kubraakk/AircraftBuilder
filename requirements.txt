@@ -5,3 +5,4 @@ pre-commit
 drf-spectacular
 uuid
 djangorestframework-simplejwt
+django-cors-headers

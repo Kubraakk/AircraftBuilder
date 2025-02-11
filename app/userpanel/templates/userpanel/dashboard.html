@@ -1,0 +1,49 @@
+{% extends "userpanel/base.html" %}
+
+{% block content %}
+<div class="container text-center mt-4">
+    <h2>Hoş Geldiniz, <span id="username">Yükleniyor...</span>!</h2>
+    <h4>Takımınız: <span id="user-team">Yükleniyor...</span></h4>
+    <div class="mt-4">
+        <img src="/static/images/baykar.jpg" alt="Baykar" class="img-fluid">
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+        window.location.href = "{% url 'login' %}";
+        return;
+    }
+
+    // ID'leri takım isimlerine çevirecek eşleme sözlüğü
+    const teamNames = {
+        1: "Kanat Takımı",
+        2: "Gövde Takımı",
+        3: "Kuyruk Takımı",
+        4: "Aviyonik Takımı",
+        5: "Montaj Takımı"
+    };
+
+    // Kullanıcı bilgilerini al
+    fetch("/api/auth/me/", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("username").innerText = data.first_name || "Kullanıcı";
+
+        // Takım ID'sini string olarak çevir
+        let teamName = teamNames[data.team] || "Takım atanmadı";
+        document.getElementById("user-team").innerText = teamName;
+    })
+    .catch(error => console.error("Kullanıcı bilgisi alınamadı:", error));
+});
+</script>
+{% endblock %}

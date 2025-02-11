@@ -1,0 +1,90 @@
+{% extends "userpanel/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Yeni Parça Ekle</h2>
+
+    <div id="error-message" class="alert alert-danger d-none"></div>
+    <div id="success-message" class="alert alert-success d-none">Parça başarıyla eklendi!</div>
+
+    <form id="create-part-form">
+        <div class="mb-3">
+            <label class="form-label">Parça Adı</label>
+            <select class="form-control" id="name" required>
+                <option value="1">Kanat</option>
+                <option value="2">Gövde</option>
+                <option value="3">Kuyruk</option>
+                <option value="4">Aviyonik</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Uçak Modeli</label>
+            <select class="form-control" id="aircraft" required>
+                <option value="1">TB2</option>
+                <option value="2">TB3</option>
+                <option value="3">AKINCI</option>
+                <option value="4">KIZILELMA</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Takım</label>
+            <select class="form-control" id="team" required>
+                <option value="1">Kanat Takımı</option>
+                <option value="2">Gövde Takımı</option>
+                <option value="3">Kuyruk Takımı</option>
+                <option value="4">Aviyonik Takımı</option>
+                <option value="5">Montaj Takımı</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Parçayı Ekle</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+        window.location.href = "{% url 'login' %}";  // Eğer kullanıcı giriş yapmadıysa, login sayfasına yönlendir
+        return;
+    }
+
+    document.getElementById("create-part-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const aircraft = document.getElementById("aircraft").value;
+        const team = document.getElementById("team").value;
+
+        fetch("/api/parts/parts/", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: parseInt(name),
+                aircraft: parseInt(aircraft),
+                team: parseInt(team)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                document.getElementById("success-message").classList.remove("d-none");
+                setTimeout(() => {
+                    window.location.href = "{% url 'inventory_status' %}";
+                }, 1500);
+            } else {
+                document.getElementById("error-message").innerText = data.error || "Parça eklenirken hata oluştu!";
+                document.getElementById("error-message").classList.remove("d-none");
+            }
+        })
+        .catch(error => console.error("Parça ekleme hatası:", error));
+    });
+});
+</script>
+{% endblock %}

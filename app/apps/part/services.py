@@ -36,15 +36,19 @@ class PartService(BaseService):
             )
 
         # Parçayı oluştur
-        part = self.create(name=name, aircraft=aircraft, team=team)
+        part = Part.objects.filter(
+            name=name, aircraft=aircraft, team=team
+        ).first()
 
-        # Envantere ekle
-        inventory, created = Inventory.objects.get_or_create(
-            part=part, defaults={"quantity": 1}
-        )
-        if not created:
+        # Eğer parça zaten varsa, envanterdeki quantity artır
+        if part:
+            inventory = Inventory.objects.get(part=part)
             inventory.quantity += 1
             inventory.save()
+        else:
+            # Yeni bir parça ekle
+            part = Part.objects.create(name=name, aircraft=aircraft, team=team)
+            Inventory.objects.create(part=part, quantity=1)
 
         return part
 
@@ -62,7 +66,7 @@ class InventoryService(BaseService):
 
     def get_inventory(self):
         """Tüm envanteri getir"""
-        return self.get_all()
+        return self.get_all().filter(quantity__gt=0)
 
     def get_missing_parts(self):
         """Eksik parçaları getir"""
@@ -91,8 +95,6 @@ class AssemblyService(BaseService):
 
     def assemble_aircraft(self, aircraft, user):
         """Montaj işlemini gerçekleştir, eksik parçaları kontrol et ve envanterden düş"""
-
-        from core.enums import PartChoices, TeamChoices
 
         if user.team.name != TeamChoices.ASSEMBLY:
             return {"error": "Sadece Montaj Takımı uçak üretebilir!"}, 403
