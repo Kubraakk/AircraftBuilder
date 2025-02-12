@@ -75,7 +75,7 @@ docker compose run --rm app sh -c "python manage.py createsuperuser"
 docker compose up
 ```
 
-4️⃣ Testleri Çalıştırın
+5️⃣ Testleri Çalıştırın
 
 ```bash
 docker compose run --rm app sh -c "python manage.py test"
