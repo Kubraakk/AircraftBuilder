@@ -27,7 +27,7 @@ Hava aracı üretim süreçlerinin yönetilmesi için geliştirilmiş bir sistem
 
 ✅ Montaj ekibi, tamamlanmış parçaları birleştirerek uçak üretir.<br>
 ✅ Eksik parçalar varsa sistem uyarı verir (Örn: Akıncı için gövde eksik).<br>
-✅ Montaj tamamlandığında stok güncellenir ve kullanılan parçalar envanterden düşülür.
+✅ Montaj tamamlandığında stok güncellenir ve kullanılan parçalar envanterden düşülür.<br>
 ✅ Montajı tamamlanan uçaklar listelenebilir.
 
 ## Kullanılan Teknolojiler
@@ -88,7 +88,9 @@ Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
 | **POST**     | `/api/auth/register/`           | Yeni kullanıcı kaydı oluşturur |
 | **GET**      | `/api/auth/me/`                 | Kullanıcı bilgilerini getirir  |
 | **GET**      | `/api/parts/inventory/`         | Envanterdeki parçaları getirir |
+| **GET**      | `/api/parts/parts/`             | Eklenen parçaları listeler     |
 | **POST**     | `/api/parts/parts/`             | Yeni parça ekler               |
 | **DELETE**   | `/api/parts/parts/{id}/`        | Bir parçayı sistemden siler    |
+| **UPDATE**   | `/api/parts/parts/{id}/`        | Bir parçayı günceller          |
 | **GET**      | `/api/parts/assembly/`          | Montaj işlemlerini listeler    |
 | **POST**     | `/api/parts/assembly/assemble/` | Montaj işlemini başlatır       |
