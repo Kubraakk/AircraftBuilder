@@ -4,8 +4,8 @@
 <div class="container mt-4">
     <h2 class="text-center">Envanter Durumu</h2>
 
-    <table class="table table-bordered mt-3">
-        <thead class="table-dark">
+    <table id="inventory-table" class="display">
+        <thead>
             <tr>
                 <th>Parça Adı</th>
                 <th>Uçak Modeli</th>
@@ -13,7 +13,7 @@
                 <th>İşlem</th>
             </tr>
         </thead>
-        <tbody id="inventory-table">
+        <tbody>
         </tbody>
     </table>
 </div>
@@ -26,61 +26,47 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "{% url 'login' %}";
         return;
     }
-
-    const inventoryTable = document.getElementById("inventory-table");
-
-    function fetchInventory() {
-        fetch("/api/parts/inventory/", {
-            method: "GET",
-            headers: { "Authorization": `Bearer ${accessToken}` }
-        })
-        .then(response => response.json())
-        .then(data => {
-            inventoryTable.innerHTML = "";
-
-            data.forEach(item => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${item.part_name}</td>
-                    <td>${item.aircraft_name}</td>
-                    <td>${item.quantity}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm delete-btn" data-id="${item.id}" ${item.quantity > 0 ? "" : "disabled"}>
-                            Sil
-                        </button>
-                    </td>
+    fetch("/api/parts/inventory/", {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${accessToken}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        let tableBody = "";
+        data.forEach(item => {
+            if (item.quantity > 0) {
+                tableBody += `
+                    <tr>
+                        <td>${item.part_name}</td>
+                        <td>${item.aircraft_name}</td>
+                        <td>${item.quantity}</td>
+                        <td><button class="delete-btn btn btn-danger" data-id="${item.id}">Sil</button></td>
+                    </tr>
                 `;
-                inventoryTable.appendChild(row);
-            });
-            document.querySelectorAll(".delete-btn").forEach(button => {
-                button.addEventListener("click", function () {
-                    const partId = this.getAttribute("data-id");
-                    deletePart(partId);
-                });
-            });
-        })
-        .catch(error => console.error("Envanter alınamadı:", error));
-    }
+            }
+        });
 
-    function deletePart(partId) {
-        if (!confirm("Bu parçayı silmek istediğinize emin misiniz?")) return;
+        document.querySelector("#inventory-table tbody").innerHTML = tableBody;
+        $("#inventory-table").DataTable();
+    })
+    .catch(error => console.error("Envanter yüklenirken hata:", error));
 
+    $(document).on("click", ".delete-btn", function () {
+        let partId = $(this).data("id");
         fetch(`/api/parts/parts/${partId}/`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${accessToken}` }
         })
         .then(response => {
-            if (response.status === 204) {
+            if (response.ok) {
                 alert("Parça başarıyla silindi!");
-                fetchInventory();
+                location.reload();
             } else {
-                alert("Parça silinirken hata oluştu!");
+                alert("Silme işlemi başarısız!");
             }
         })
-        .catch(error => console.error("Silme işlemi başarısız:", error));
-    }
-
-    fetchInventory();
+        .catch(error => console.error("Silme hatası:", error));
+    });
 });
 </script>
 {% endblock %}
