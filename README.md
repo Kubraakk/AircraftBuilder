@@ -94,3 +94,7 @@ Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
 | **UPDATE**   | `/api/parts/parts/{id}/`        | Bir parçayı günceller          |
 | **GET**      | `/api/parts/assembly/`          | Montaj işlemlerini listeler    |
 | **POST**     | `/api/parts/assembly/assemble/` | Montaj işlemini başlatır       |
+
+## Ekran Görüntüleri
+
+![Login](static/images/login.png)
