@@ -97,4 +97,12 @@ Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
 
 ## Ekran Görüntüleri
 
-![Login](static/images/login.png)
+![Login](app/userpanel/static/images/login.png) <br>
+
+![Login](app/userpanel/static/images/envanter.png) <br>
+
+![Login](app/userpanel/static/images/montaj.png) <br>
+
+![Login](app/userpanel/static/images/montaj-hata.png) <br>
+
+![Login](app/userpanel/static/images/ucaklar.png) <br>
