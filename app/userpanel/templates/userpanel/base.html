@@ -34,7 +34,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const accessToken = localStorage.getItem("access_token");
 
-    // Eğer kullanıcı giriş yaptıysa, menüyü göster
     if (accessToken) {
         document.getElementById("nav-links").style.display = "flex";
     }

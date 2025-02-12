@@ -17,8 +17,6 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "{% url 'login' %}";
         return;
     }
-
-    // ID'leri takım isimlerine çevirecek eşleme sözlüğü
     const teamNames = {
         1: "Kanat Takımı",
         2: "Gövde Takımı",
@@ -27,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function () {
         5: "Montaj Takımı"
     };
 
-    // Kullanıcı bilgilerini al
     fetch("/api/auth/me/", {
         method: "GET",
         headers: {
@@ -38,8 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
     .then(response => response.json())
     .then(data => {
         document.getElementById("username").innerText = data.first_name || "Kullanıcı";
-
-        // Takım ID'sini string olarak çevir
         let teamName = teamNames[data.team] || "Takım atanmadı";
         document.getElementById("user-team").innerText = teamName;
     })

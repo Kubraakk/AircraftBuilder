@@ -52,7 +52,7 @@ class AssemblySerializer(serializers.ModelSerializer):
 
     def get_parts_used(self, obj):
         """
-        Montajda kullanılan parçaları doğru şekilde listele.
+        Listing of the parts used in assembly.
         """
         part_usage_dict = defaultdict(int)
 

@@ -19,6 +19,11 @@ class TimeStampedModel(models.Model):
 
 
 class AuditMixin(TimeStampedModel):
+    """
+    Abstract model to track creation and update timestamps,
+    along with the user who created or last modified the record.
+    """
+
     created_by = models.ForeignKey(
         get_user_model(),
         related_name="%(class)s_created",

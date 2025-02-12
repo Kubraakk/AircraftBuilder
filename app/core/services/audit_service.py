@@ -1,4 +1,4 @@
-from common.utils import get_current_user
+from core.utils import get_current_user
 
 
 class AuditService:

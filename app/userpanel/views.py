@@ -25,16 +25,13 @@ def assemble_aircraft(request):
 
 
 def login_view(request):
-    """Kullanıcı girişi (JWT ile yapılacak)"""
     return render(request, "userpanel/login.html")
 
 
 def register_view(request):
-    """Kullanıcı kaydı (JWT ile yapılacak)"""
     return render(request, "userpanel/register.html")
 
 
 def logout_view(request):
-    """Çıkış yap"""
     logout(request)
     return redirect("login")

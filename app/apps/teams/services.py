@@ -9,5 +9,5 @@ class TeamService(BaseService):
         super().__init__(Team)
 
     def create_team(self, name):
-        """Create a new team"""
+        """Create a new team using"""
         return self.create(name=name)

@@ -15,7 +15,6 @@
             </tr>
         </thead>
         <tbody id="aircraft-table">
-            <!-- Veriler buraya eklenecek -->
         </tbody>
     </table>
 </div>
@@ -39,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
             headers: { "Authorization": `Bearer ${accessToken}` }
         })
         .then(response => {
-            if (response.status === 403) {  // 🛑 Eğer kullanıcı yetkisizse
+            if (response.status === 403) {
                 throw new Error("Bu sayfayı görüntüleme yetkiniz yok.");
             }
             return response.json();
@@ -52,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            aircraftTable.innerHTML = "";  // Önce tabloyu temizle
+            aircraftTable.innerHTML = "";
 
             data.forEach(item => {
                 let partsUsed = item.parts_used.map(part => `${part.part_name} (${part.quantity_used})`).join(", ");
@@ -74,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error(error.message);
             errorMessage.innerText = error.message;
             errorMessage.classList.remove("d-none");
-            aircraftTableContainer.style.display = "none";  // Tabloyu gizle
+            aircraftTableContainer.style.display = "none";
         });
     }
 

@@ -3,8 +3,8 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 class IsAdminOrReadOnly(BasePermission):
     """
-    Kullanıcı adminse tüm yetkilere sahiptir.
-    Admin değilse sadece okuma (GET) yetkisi vardır.
+    If the user is admin, he has all permissions.
+    If there is not admin, there is only read (GET) permission.
     """
 
     def has_permission(self, request, view):
@@ -13,7 +13,7 @@ class IsAdminOrReadOnly(BasePermission):
 
 class IsTeamMember(BasePermission):
     """
-    Kullanıcı yalnızca kendi takımına ait verileri yönetebilir.
+    The user can only manage data belonging to her own team.
     """
 
     def has_permission(self, request, view):
@@ -25,31 +25,21 @@ class IsTeamMember(BasePermission):
 
 class IsAssemblyTeam(BasePermission):
     """
-    Sadece montaj ekibine özel yetki.
-    Montaj ekibi uçakları oluşturabilir ve yönetebilir.
-    Diğer herkes sadece listeleme yapabilir.
+    Special authority only for the assembly team.
+    The assembly team can build and manage planes.
+    Everyone else can just list.
     """
 
     def has_permission(self, request, view):
-        # Eğer sadece listeleme (GET) yapıyorsa herkes erişebilir
         if request.method in SAFE_METHODS:
             return True
-
-        # Admin ise her şeye erişebilir
         if request.user.is_staff:
             return True
-
-        # Sadece Montaj Takımı işlem yapabilir
         return request.user.team and request.user.team.name == "Montaj Takımı"
 
     def has_object_permission(self, request, view, obj):
-        # Listeleme (GET) serbest
         if request.method in SAFE_METHODS:
             return True
-
-        # Admin her şeyi yönetebilir
         if request.user.is_staff:
             return True
-
-        # Montaj takımı uçağı yönetebilir
         return request.user.team.name == "Montaj Takımı"

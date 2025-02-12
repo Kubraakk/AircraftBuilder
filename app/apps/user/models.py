@@ -9,6 +9,12 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
+    """
+    Custom manager for User model.
+
+    Provides helper methods for creating regular users and superusers.
+    """
+
     def create_user(
         self, email, first_name, last_name, password=None, **extra_fields
     ):
@@ -36,6 +42,12 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """
+    Custom User model for authentication.
+
+    This model replaces Django's default User model, using email as the unique identifier.
+    """
+
     id = models.BigAutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     email = models.EmailField(unique=True)
@@ -49,8 +61,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name"]
+    USERNAME_FIELD = "email"  # Assign custom user manager
+    REQUIRED_FIELDS = [
+        "first_name",
+        "last_name",
+    ]  # Use email for authentication
 
     class Meta:
         verbose_name = _("Personal")

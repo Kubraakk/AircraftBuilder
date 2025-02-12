@@ -1,14 +1,11 @@
-"""
-Models for aircraft
-"""
-
 from django.db import models
 from core.enums import AircraftChoices
+from core.mixins import AuditMixin
 from django.utils.translation import gettext_lazy as _
 
 
-class Aircraft(models.Model):
-    aircraft_name = models.IntegerField(
+class Aircraft(AuditMixin):
+    aircraft_name = models.IntegerField(  # enum used for aircraft name
         choices=AircraftChoices.choices, unique=True
     )
 

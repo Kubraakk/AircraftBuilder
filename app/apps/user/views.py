@@ -1,7 +1,3 @@
-"""
-Views for the User API
-"""
-
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
@@ -17,6 +13,12 @@ User = get_user_model()
 
 
 class UserView(APIView):
+    """
+    API endpoint to retrieve authenticated user details.
+
+    This view requires authentication and returns the current user's details.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -26,12 +28,24 @@ class UserView(APIView):
 
 
 class RegisterView(CreateAPIView):
+    """
+    API endpoint for user registration.
+
+    This view allows new users to register by providing required credentials.
+    """
+
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
 
 class LoginView(APIView):
+    """
+    API endpoint for user authentication.
+
+    This view authenticates users and returns JWT access and refresh tokens.
+    """
+
     permission_classes = (AllowAny,)
 
     def post(self, request):

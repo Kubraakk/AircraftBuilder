@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
-from rest_framework.views import APIView
 from core.permissions import IsTeamMember
 from core.enums import TeamChoices
 from apps.aircraft.models import Aircraft
@@ -12,7 +11,11 @@ from apps.part.serializers import (
     InventorySerializer,
     AssemblySerializer,
 )
-from apps.part.services import PartService, InventoryService, AssemblyService
+from apps.part.services import (
+    PartService,
+    InventoryService,
+    AssemblyService,
+)
 
 
 class PartViewSet(viewsets.ModelViewSet):
@@ -21,14 +24,14 @@ class PartViewSet(viewsets.ModelViewSet):
     service = PartService()
 
     def get_queryset(self):
-        """Kullanıcı sadece kendi takımının ürettiği parçaları görebilir."""
+        """The user can only see the parts produced by her own team."""
         user = self.request.user
         if user.is_staff or user.team.name == TeamChoices.ASSEMBLY:
             return self.service.get_all()
         return self.service.get_parts_for_team(user.team)
 
     def perform_create(self, serializer):
-        """Sadece kullanıcının takımı için parça üretmesine izin verir."""
+        """It only allows the user to produce parts for their team."""
         user = self.request.user
         part_name = serializer.validated_data["name"]
         team = user.team
@@ -44,7 +47,7 @@ class PartViewSet(viewsets.ModelViewSet):
         serializer.instance = part
 
     def perform_destroy(self, instance):
-        """Kullanıcı sadece kendi takımına ait parçaları silebilir."""
+        """The user can only delete parts belonging to her own team."""
         user = self.request.user
 
         if instance.team != user.team and not user.is_staff:
@@ -62,12 +65,11 @@ class InventoryViewSet(viewsets.ModelViewSet):
     service = InventoryService()
 
     def get_queryset(self):
-        """Envanterdeki tüm parçaları listele"""
         return self.service.get_inventory()
 
     @action(detail=False, methods=["get"])
     def missing_parts(self, request):
-        """Eksik parçaları listeleyen endpoint"""
+        """Endpoint listing missing parts"""
         missing = self.service.get_missing_parts()
         return Response({"missing_parts": missing})
 
@@ -78,7 +80,7 @@ class AssemblyViewSet(viewsets.ModelViewSet):
     service = AssemblyService()
 
     def get_queryset(self):
-        """Montaj takımı ve admin üretilen uçakları görebilir."""
+        """The assembly team and admin can see the produced aircraft."""
         user = self.request.user
         if user.is_staff or user.team.name == TeamChoices.ASSEMBLY:
             return self.service.get_all()
@@ -86,7 +88,7 @@ class AssemblyViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     def assemble(self, request):
-        """Montaj işlemini başlatır"""
+        """Starts the assembly process"""
         user = request.user
         aircraft_id = request.data.get("aircraft")
 
@@ -103,33 +105,3 @@ class AssemblyViewSet(viewsets.ModelViewSet):
             return Response(result, status=status_code)
 
         return Response(AssemblySerializer(result).data, status=status_code)
-
-
-class PartsCountView(APIView):
-    permission_classes = [IsAuthenticated]
-    service = PartService()
-
-    def list(self, request):
-        """Stoktaki toplam parça sayısını döndür"""
-        count = self.service.get_total_parts_count()
-        return Response({"count": count})
-
-
-class MissingPartsView(APIView):
-    permission_classes = [IsAuthenticated]
-    service = PartService()
-
-    def list(self, request):
-        """Eksik parçaları listeleyen endpoint"""
-        missing_parts = self.service.get_missing_parts()
-        return Response({"missing_parts": missing_parts})
-
-
-class AssemblyCountView(APIView):
-    permission_classes = [IsAuthenticated]
-    service = AssemblyService()
-
-    def get(self, request):
-        """Tamamlanan montaj işlemlerinin sayısını döndür"""
-        count = self.service.get_all().count()
-        return Response({"count": count})

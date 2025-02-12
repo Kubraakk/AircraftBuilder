@@ -2,10 +2,11 @@ from django.db import models
 from apps.aircraft.models import Aircraft
 from apps.teams.models import Team
 from core.enums import PartChoices
+from core.mixins import AuditMixin
 from django.utils.translation import gettext_lazy as _
 
 
-class Part(models.Model):
+class Part(AuditMixin):
     name = models.IntegerField(choices=PartChoices.choices)
     aircraft = models.ForeignKey(
         Aircraft, on_delete=models.CASCADE, related_name="parts"
@@ -22,7 +23,7 @@ class Part(models.Model):
         return f"{self.get_name_display()} for {self.aircraft.get_aircraft_name_display()}"
 
 
-class Inventory(models.Model):
+class Inventory(AuditMixin):
     part = models.ForeignKey(Part, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
 
@@ -34,10 +35,9 @@ class Inventory(models.Model):
         return f"{self.part.get_name_display()} - {self.quantity} adet"
 
 
-class Assembly(models.Model):
+class Assembly(AuditMixin):
     aircraft = models.ForeignKey(Aircraft, on_delete=models.CASCADE)
     parts_used = models.ManyToManyField(Part, through="AssemblyPartUsage")
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = _("Assembly")
@@ -47,7 +47,7 @@ class Assembly(models.Model):
         return f"{self.aircraft.get_aircraft_name_display()} Montajı"
 
 
-class AssemblyPartUsage(models.Model):
+class AssemblyPartUsage(AuditMixin):
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
     part = models.ForeignKey(Part, on_delete=models.CASCADE)
     quantity_used = models.PositiveIntegerField()

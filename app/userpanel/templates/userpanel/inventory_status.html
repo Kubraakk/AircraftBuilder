@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const accessToken = localStorage.getItem("access_token");
 
     if (!accessToken) {
-        window.location.href = "{% url 'login' %}";  // Giriş yapılmadıysa login sayfasına yönlendir
+        window.location.href = "{% url 'login' %}";
         return;
     }
 
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-            inventoryTable.innerHTML = "";  // Önce tabloyu temizle
+            inventoryTable.innerHTML = "";
 
             data.forEach(item => {
                 const row = document.createElement("tr");
@@ -52,8 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
                 inventoryTable.appendChild(row);
             });
-
-            // Silme butonlarına event listener ekle
             document.querySelectorAll(".delete-btn").forEach(button => {
                 button.addEventListener("click", function () {
                     const partId = this.getAttribute("data-id");
@@ -74,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => {
             if (response.status === 204) {
                 alert("Parça başarıyla silindi!");
-                fetchInventory(); // Listeyi güncelle
+                fetchInventory();
             } else {
                 alert("Parça silinirken hata oluştu!");
             }
@@ -82,7 +80,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Silme işlemi başarısız:", error));
     }
 
-    // Sayfa açıldığında envanteri yükle
     fetchInventory();
 });
 </script>

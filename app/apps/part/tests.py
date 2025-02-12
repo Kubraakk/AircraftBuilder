@@ -10,7 +10,6 @@ class PartServiceTest(TestCase):
     """Unit tests for PartService"""
 
     def setUp(self):
-        """Set up test data before each test"""
         self.service = PartService()
 
         # Create teams and aircraft

@@ -13,11 +13,10 @@ class PartService(BaseService):
         super().__init__(Part)
 
     def get_parts_for_team(self, team):
-        """Takıma ait parçaları getir"""
         return self.get_all(team=team)
 
     def create_part(self, name, aircraft, team):
-        """Sadece ilgili takımın üretebileceği parçaları üretmesine izin verir."""
+        """It only allows the relevant team to produce parts that it can produce."""
         allowed_parts = {
             TeamChoices.WING: [PartChoices.WING],
             TeamChoices.FUSELAGE: [PartChoices.FUSELAGE],
@@ -34,26 +33,29 @@ class PartService(BaseService):
                     "error": f"{TeamChoices(team.name).label} {PartChoices(name).label} üretemez!"
                 }
             )
-
-        # Parçayı oluştur
+        # If you already have the part, increase the amount in inventory.
         part = Part.objects.filter(
             name=name, aircraft=aircraft, team=team
         ).first()
 
-        # Eğer parça zaten varsa, envanterdeki quantity artır
         if part:
-            inventory = Inventory.objects.get(part=part)
-            inventory.quantity += 1
-            inventory.save()
+            inventory = Inventory.objects.filter(part=part).first()
+            if inventory:
+                inventory.quantity += (
+                    1  # Increase quantity if it already exists
+                )
+                inventory.save()
+            else:
+                Inventory.objects.create(part=part, quantity=1)
+
         else:
-            # Yeni bir parça ekle
+            # Add new part
             part = Part.objects.create(name=name, aircraft=aircraft, team=team)
             Inventory.objects.create(part=part, quantity=1)
 
         return part
 
     def delete_part(self, part):
-        """Parçayı envanterden kaldır ve sil"""
         Inventory.objects.filter(part=part).delete()
         return part.delete()
 
@@ -65,11 +67,10 @@ class InventoryService(BaseService):
         super().__init__(Inventory)
 
     def get_inventory(self):
-        """Tüm envanteri getir"""
         return self.get_all().filter(quantity__gt=0)
 
     def get_missing_parts(self):
-        """Eksik parçaları getir"""
+        """Bring the missing pieces"""
         missing = []
         for part in Part.objects.all():
             inventory_item = Inventory.objects.filter(part=part).aggregate(
@@ -94,7 +95,7 @@ class AssemblyService(BaseService):
         super().__init__(Assembly)
 
     def assemble_aircraft(self, aircraft, user):
-        """Montaj işlemini gerçekleştir, eksik parçaları kontrol et ve envanterden düş"""
+        """Perform assembly, check for missing parts and drop them from inventory"""
 
         if user.team.name != TeamChoices.ASSEMBLY:
             return {"error": "Sadece Montaj Takımı uçak üretebilir!"}, 403
