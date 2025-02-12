@@ -75,6 +75,12 @@ docker compose run --rm app sh -c "python manage.py createsuperuser"
 docker compose up
 ```
 
+4️⃣ Testleri Çalıştırın
+
+```bash
+docker compose run --rm app sh -c "python manage.py test"
+```
+
 Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
 🌍 Frontend: http://127.0.0.1:8000/userpanel/login/<br>
 ⚙️ Admin Panel: http://127.0.0.1:8000/admin/<br>
