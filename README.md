@@ -97,7 +97,7 @@ Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
 
 ## API Yanıtları
 
-### Kullanıcı Bilgisi Getirme\*\*
+### Kullanıcı Bilgisi Getirme
 
 **POST** `/api/auth/login/`
 
@@ -141,6 +141,8 @@ Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
 }
 ```
 
+### Parça Üretme
+
 **POST** `/api/parts/parts`
 
 ```json
@@ -171,6 +173,8 @@ Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
 }
 ```
 
+### Envanter Listesi
+
 **GET** `/api/parts/inventory/`
 **Yanıt(Response)**
 
@@ -196,6 +200,8 @@ Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
   }
 ]
 ```
+
+### Üretilen Uçaklar Listesi
 
 **GET** `/api/parts/assembly/`
 **Yanıt(Response)**
@@ -228,6 +234,8 @@ Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
   }
 ]
 ```
+
+### Uçak Montajı
 
 **POST** `/api/parts/assembly/assemble/`
 
