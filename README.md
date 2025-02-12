@@ -13,20 +13,20 @@ Hava aracı üretim süreçlerinin yönetilmesi için geliştirilmiş bir sistem
 
 ### Personel & Takım Yönetimi
 
-✅ Kullanıcılar sisteme giriş yapabilir.
-✅ Her personelin belirli bir takımı vardır. (Aviyonik, Kanat, Gövde, Kuyruk, Montaj)
+✅ Kullanıcılar sisteme giriş yapabilir.<br>
+✅ Her personelin belirli bir takımı vardır. (Aviyonik, Kanat, Gövde, Kuyruk, Montaj)<br>
 ✅ Bir takımda birden fazla personel bulunabilir.
 
 ### Parça Üretimi ve Yönetimi
 
-✅ Takımlar, yalnızca kendi sorumluluklarındaki parçaları üretebilir.
-✅ Üretilen parçalar CRUD (Create, Read, Update, Delete) işlemlerine tabidir.
+✅ Takımlar, yalnızca kendi sorumluluklarındaki parçaları üretebilir.<br>
+✅ Üretilen parçalar CRUD (Create, Read, Update, Delete) işlemlerine tabidir.<br>
 ✅ Her parça, yalnızca belirli bir uçakta kullanılabilir (Örn: TB2 kanadı, TB3 için kullanılamaz).
 
 ### Montaj Süreci
 
-✅ Montaj ekibi, tamamlanmış parçaları birleştirerek uçak üretir.
-✅ Eksik parçalar varsa sistem uyarı verir (Örn: Akıncı için gövde eksik).
+✅ Montaj ekibi, tamamlanmış parçaları birleştirerek uçak üretir.<br>
+✅ Eksik parçalar varsa sistem uyarı verir (Örn: Akıncı için gövde eksik).<br>
 ✅ Montaj tamamlandığında stok güncellenir ve kullanılan parçalar envanterden düşülür.
 ✅ Montajı tamamlanan uçaklar listelenebilir.
 
@@ -75,9 +75,9 @@ docker compose run --rm app sh -c "python manage.py createsuperuser"
 docker compose up
 ```
 
-Artık uygulama aşağıdaki adreste çalışıyor olacak:
-🌍 Frontend: http://127.0.0.1:8000/userpanel/login/
-⚙️ Admin Panel: http://127.0.0.1:8000/admin/
+Artık uygulama aşağıdaki adreste çalışıyor olacak:<br>
+🌍 Frontend: http://127.0.0.1:8000/userpanel/login/<br>
+⚙️ Admin Panel: http://127.0.0.1:8000/admin/<br>
 📜 API Dokümantasyonu: http://127.0.0.1:8000/api/docs/
 
 ## 🔗 API Endpointleri
